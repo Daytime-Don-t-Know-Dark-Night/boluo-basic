@@ -25,5 +25,13 @@ public class ElasticSearchConfigTest {
 		System.out.println(map);
 	}
 
+	@Test
+	public void func3() throws IOException {
+		String host = "127.0.0.1";
+		String user = "user";
+		String pwd = "pwd";
+		ElasticsearchConfig.sparkGetConnection(host, user, pwd);
+	}
+
 
 }

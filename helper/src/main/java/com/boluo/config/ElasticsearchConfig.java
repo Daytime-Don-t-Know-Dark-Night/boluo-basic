@@ -2,6 +2,8 @@ package com.boluo.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -12,6 +14,9 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.message.BasicHeader;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -38,7 +43,7 @@ public class ElasticsearchConfig {
 
 		final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 		// 如果有账号密码, 在这里设置账号密码
-		// credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("user","password"));
+		credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("user", "password"));
 
 		// 创建rest client对象
 		RestClientBuilder builder = RestClient.builder(new HttpHost("127.0.0.1", 9200))
@@ -98,7 +103,32 @@ public class ElasticsearchConfig {
 	}
 
 	// spark连接es
-	public static void sparkGetConnection() {
+	public static void sparkGetConnection(String host, String user, String pwd) throws IOException {
 
+		SparkSession spark = SparkSession.builder().master("local[*]").getOrCreate();
+		Map<String, String> config = Maps.newHashMap();
+		config.put("es.nodes.wan.only", "true");
+		config.put("es.nodes", host);
+		config.put("es.port", "9200");
+		// 滚动查询读取时, 从默认值50调整为1000
+		config.put("es.scroll.size", "1000");
+		// 每个分区最多处理100万条数据
+		config.put("es.input.max.docs.per.partition", "1000000");
+		config.put("es.net.http.auth.user", user);
+		config.put("es.net.http.auth.pass", pwd);
+
+		Map<String, Integer> map = getIndicesInfo(host, user, pwd);
+		Set<String> indices = map.keySet();
+		indices = Sets.filter(indices, i -> !i.startsWith("."));
+		for (String index : indices) {
+			// 加载es中的数据
+			Dataset<Row> ds = spark.read()
+					.format("es")
+					.options(config)
+					.option("es.resource", index)
+					.load();
+			System.out.println(index + "索引中的数据: ");
+			ds.show(false);
+		}
 	}
 }
