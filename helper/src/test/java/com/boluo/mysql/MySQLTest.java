@@ -16,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 
+import static org.apache.spark.sql.functions.*;
+
 /**
  * MySQL Test
  *
@@ -46,6 +48,11 @@ public class MySQLTest {
 
 		String test_uri = "jdbc:mysql://127.0.0.1/boluo?characterEncoding=UTF-8&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&user=root&password=root";
 		JdbcOptionsInWrite opt = Jdbcs.options(test_uri, "test_table");
-		MySQL.insert2(ds, test_uri, opt, 5);
+
+		MySQL.insert2(ds, "", opt, 5);
+		MySQL.insert2(ds.repartition(200), "", opt, 5);
+		MySQL.insert2(ds.repartition(300), "", opt, 5);
+		MySQL.insert2(ds.groupBy("设备编号").agg(expr("count(0)")), "", opt, 5);
+		MySQL.insert2(ds.where(""), "", opt, 5);
 	}
 }
