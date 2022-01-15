@@ -1,9 +1,13 @@
 package com.boluo.spark;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.CharMatcher;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructType;
+
+import java.util.List;
 
 /**
  * Dataset常用操作的工具类
@@ -13,9 +17,11 @@ import org.apache.spark.sql.types.StructType;
  */
 public class Datasets {
 
+	private static final SparkSession spark = SparkSession.builder().master("local[*]").getOrCreate();
+	private static final ObjectMapper mapper = new ObjectMapper();
+
 	public static Dataset<Row> load(String path) {
 
-		SparkSession spark = SparkSession.builder().master("local[*]").getOrCreate();
 		int index = CharMatcher.anyOf(".").lastIndexIn(path) + 1;
 		String fileType = path.substring(index);
 
@@ -43,5 +49,14 @@ public class Datasets {
 		}
 		}
 		throw new IllegalArgumentException("未知的路径或者参数: " + path);
+	}
+
+	public static Dataset<Row> list2Ds(List<ObjectNode> list) {
+
+		Dataset<String> dsJson = spark
+				.createDataset(list, Encoders.kryo(ObjectNode.class))
+				.map((MapFunction<ObjectNode, String>) mapper::writeValueAsString, Encoders.STRING());
+
+		return spark.read().json(dsJson);
 	}
 }
