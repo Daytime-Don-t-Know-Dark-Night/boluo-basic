@@ -10,6 +10,11 @@ import java.sql.SQLException;
  */
 public class MySQLConfig {
 
+	public static Connection getConnection(String uri) throws ClassNotFoundException, SQLException {
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		return DriverManager.getConnection(uri);
+	}
+
 	public static Connection getConnection(String uri, String user, String pwd) throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
 		return DriverManager.getConnection(uri, user, pwd);
