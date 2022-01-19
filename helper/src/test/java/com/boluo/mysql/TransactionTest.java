@@ -36,7 +36,7 @@ public class TransactionTest {
 		init(conn);
 
 		// 脏读测试
-		// 1.建立sessionA, 并且设置当前事务为read uncommitted, 开启事务, 查询表中的初始值
+		// 1.建立sessionA, 并且设置当前事务为read uncommitted(读未提交), 开启事务, 查询表中的初始值
 		Connection conn1 = MySQLConfig.getConnection(uri);
 		conn1.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 		Statement statement1 = conn1.createStatement();
@@ -105,6 +105,29 @@ public class TransactionTest {
 		conn.close();
 		conn1.close();
 		conn2.close();
+	}
+
+	@Test
+	public void func2() throws SQLException, ClassNotFoundException {
+		Connection conn = MySQLConfig.getConnection(uri);
+		init(conn);
+
+		// 不可重复读测试
+		// 1.建立sessionA, 并且设置当前事务模式为read committed(读已提交), 开启事务
+		Connection conn1 = MySQLConfig.getConnection(uri);
+		conn1.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+		Statement statement1 = conn1.createStatement();
+		statement1.execute("start transaction");
+		ResultSet res1 = statement1.executeQuery("select * from transaction_test");
+		System.out.println("sessionA 初始化查询结果为: ");
+		while (res1.next()) {
+			Integer id = res1.getInt("id");
+			String name = res1.getString("name");
+			String balance = res1.getString("balance");
+			System.out.printf("id: '%s', name: '%s', balance: '%s'%n", id, name, balance);
+		}
+
+
 	}
 
 	private static void init(Connection conn) throws SQLException {
