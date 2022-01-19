@@ -105,7 +105,55 @@ public class TransactionTest {
 		System.out.println("sessionB 更新数据之后查询结果为: ");
 		show(res2);
 
+		// 3.这时候, sessionB的事务还未提交, sessionA已经不能查询到sessionB更新的数据, 解决了脏读问题
+		ResultSet res3 = statement1.executeQuery("select * from transaction_test");
+		System.out.println("sessionA 再次查询结果已经解决脏读问题: ");
+		show(res3);
 
+		// 4.提交sessionB的事务
+		System.out.println("sessionB 提交事务");
+		statement2.execute("commit");
+
+		// 5.sessionA再次执行查询, 会产生与sessionB提交前不一样的结果, 产生了不可重复读问题
+		ResultSet res5 = statement1.executeQuery("select * from transaction_test");
+		System.out.println("sessionA 再次查询结果, 产生了不可重复读问题");
+		show(res5);
+
+		conn.close();
+		conn1.close();
+		conn2.close();
+	}
+
+	@Test
+	public void func3() throws SQLException, ClassNotFoundException {
+		Connection conn = MySQLConfig.getConnection(uri);
+		init(conn);
+
+		// 幻读测试
+		// 1.建立sessionA, 并且设置当前事务模式为repeatable read(可重复读), 开启事务
+		Connection conn1 = MySQLConfig.getConnection(uri);
+		conn1.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+		Statement statement1 = conn1.createStatement();
+		statement1.execute("start transaction");
+		ResultSet res1 = statement1.executeQuery("select * from transaction_test");
+		System.out.println("sessionA 初始化查询结果为: ");
+		show(res1);
+
+		// 2.建立sessionB, 并且插入一条新数据
+		Connection conn2 = MySQLConfig.getConnection(uri);
+		conn2.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+		Statement statement2 = conn2.createStatement();
+		statement2.execute("start transaction");
+		int num = statement2.executeUpdate("insert into transaction_test values (4, 'ceshi', 2000)");
+		Preconditions.checkArgument(num == 1, "插入数据失败! ");
+		ResultSet res2 = statement2.executeQuery("select * from transaction_test");
+		System.out.println("sessionB 插入新数据之后查询结果为: ");
+		show(res2);
+
+		// 3.在sessionB提交事务之前, 再次查询sessionA的数据, mvvc解决了读的幻读, 使用读未提交隔离机制可复现幻读结果
+		ResultSet res3 = statement1.executeQuery("select * from transaction_test");
+		System.out.println("sessionA 再次查询结果为: ");
+		show(res3);
 	}
 
 	private static void init(Connection conn) throws SQLException {
