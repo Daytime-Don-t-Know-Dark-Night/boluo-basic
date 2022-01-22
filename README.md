@@ -23,3 +23,4 @@
 
 ## 使用规范
 
+![可乐](https://gitee.com/yuanyingshuo/pic-md1/raw/master/1e4eccdb0db03cde.jpg)
