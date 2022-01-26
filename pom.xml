@@ -19,5 +19,12 @@
         <module>helper</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.boluo</groupId>
+            <artifactId>helper</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
 
 </project>
