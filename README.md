@@ -42,8 +42,8 @@
         <td><img title="在需要使用的模块中引入basic" src="https://gitee.com/yuanyingshuo/pic-md1/raw/master/在需要使用的模块中引入basic.png"/></td>
     </tr>
     <tr>
-    <td><img title="使用basic子模块中的方法" src="https://gitee.com/yuanyingshuo/pic-md1/raw/master/使用basic子模块中的方法.png"/></td>
-    <td><img title="哈哈哈这只是一个分隔符" src="https://gitee.com/yuanyingshuo/pic-md1/raw/master/分隔符1.png"/></td>
+        <td><img title="使用basic子模块中的方法" src="https://gitee.com/yuanyingshuo/pic-md1/raw/master/使用basic子模块中的方法.png"/></td>
+        <td><img title="哈哈哈这只是一个分隔符" src="https://gitee.com/yuanyingshuo/pic-md1/raw/master/分隔符1.png"/></td>
 	</tr>
 </table>
 
