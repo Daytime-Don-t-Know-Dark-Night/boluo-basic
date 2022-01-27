@@ -7,10 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * Transaction isolation Test
@@ -23,7 +20,7 @@ public class TransactionTest {
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final Logger logger = LoggerFactory.getLogger(TransactionTest.class);
 
-	private static final String uri = "jdbc:mysql://localhost:3306/boluo?characterEncoding=UTF-8&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&user=root&password=root";
+	private static final String uri = "jdbc:mysql://local.landeli.com/test_boluo?serverTimezone=GMT%2B8&rewriteBatchedStatements=true&autoReconnect=true&user=root&password=Xlpro2019";
 
 	@Test
 	// https://www.cnblogs.com/huanongying/p/7021555.html
@@ -160,12 +157,16 @@ public class TransactionTest {
 		// 初始化连接中的测试表
 		Statement statement = conn.createStatement();
 
-		// 重新创建测试表
-		statement.executeUpdate("truncate table transaction_test");
-		statement.executeUpdate("drop table if exists transaction_test");
-		statement.executeUpdate("create table transaction_test (`id` int, `name` varchar(60), balance int) DEFAULT CHARSET=utf8mb4");
+		try {
+			// 删除测试表
+			statement.executeUpdate("truncate table transaction_test");
+			statement.executeUpdate("drop table if exists transaction_test");
+		} catch (SQLSyntaxErrorException e) {
+			e.printStackTrace();
+		}
 
 		// 添加数据
+		statement.executeUpdate("create table transaction_test (`id` int, `name` varchar(60), balance int) DEFAULT CHARSET=utf8mb4");
 		statement.execute("insert into transaction_test values (1, 'boluo', 450)");
 		statement.execute("insert into transaction_test values (2, 'qidai', 1000)");
 		statement.execute("insert into transaction_test values (3, 'dingc', 1500)");
