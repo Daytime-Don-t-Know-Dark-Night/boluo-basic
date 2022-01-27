@@ -411,7 +411,6 @@ public class MySQL {
 		}
 	}
 
-
 	private static int partitionNum(LogicalPlan plan) {
 		if (plan instanceof Repartition) {
 			System.out.println("df.logicalPlan类型为: Repartition");
