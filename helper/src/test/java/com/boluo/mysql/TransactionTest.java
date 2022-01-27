@@ -20,7 +20,7 @@ public class TransactionTest {
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final Logger logger = LoggerFactory.getLogger(TransactionTest.class);
 
-	private static final String uri = "jdbc:mysql://local.landeli.com/test_boluo?serverTimezone=GMT%2B8&rewriteBatchedStatements=true&autoReconnect=true&user=root&password=Xlpro2019";
+	private static final String uri = "jdbc:mysql://localhost:3306/boluo?characterEncoding=UTF-8&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&user=root&password=root";
 
 	@Test
 	// https://www.cnblogs.com/huanongying/p/7021555.html
