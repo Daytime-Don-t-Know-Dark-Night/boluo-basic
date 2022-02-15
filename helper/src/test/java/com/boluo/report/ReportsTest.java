@@ -6,6 +6,19 @@ import org.junit.Test;
 public class ReportsTest {
 
 	@Test
+	public void splitAllTest() {
+		String context = "abcd";
+		int size = -1;
+		Iterable<Iterable<String>> res = Reports.splitAll(context, size);
+		for (Iterable<String> i : res) {
+			for (String j : i) {
+				System.out.print(StringEscapeUtils.escapeJava(j) + "   ");
+			}
+			System.out.print('\n');
+		}
+	}
+
+	@Test
 	public void splitContentTest() {
 		String context = "君不见黄河之水天上来，奔流到海不复回。\n" +
 				"君不见高堂明镜悲白发，朝如青丝暮成雪。\n" +
